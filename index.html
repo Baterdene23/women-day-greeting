@@ -395,15 +395,7 @@
       <p>Баярын мэндчилгээ илгээх боломжтой</p>
     </div>
     <div class="sender-body">
-      <div class="sender-info-section">
-        <div class="section-title">Таны мэдээлэл</div>
-        <div class="field">
-          <label>Таны нэр (илгээгч)</label>
-          <input type="text" id="senderName" placeholder="Жишээ: Батаа"/>
-        </div>
-      </div>
-
-      <div class="section-title">🎀 Хүлээн авагч</div>
+      <div class="section-title">🎀 Хүлээн авагчид</div>
       <div class="recipients-list" id="recipientsList"></div>
       <button class="add-recipient-btn" id="addRecipientBtn">
         <span>➕</span> Хүлээн авагч нэмэх
@@ -471,7 +463,11 @@
         <input type="text" id="recipientName" placeholder="Жишээ: Оюунаа"/>
       </div>
       <div class="field">
-        <label>Зурагнууд</label>
+        <label>Таны нэр (илгээгч)</label>
+        <input type="text" id="recipientSenderName" placeholder="Жишээ: Батаа"/>
+      </div>
+      <div class="field">
+        <label>Зурагнууд (2 хүртэл)</label>
         <div class="photos-upload-grid" id="photosGrid"></div>
       </div>
       <div class="field">
@@ -631,7 +627,6 @@ const views = {
 
 const modeToggle = document.getElementById('modeToggle');
 const backBtn = document.getElementById('backBtn');
-const senderNameInput = document.getElementById('senderName');
 const recipientsList = document.getElementById('recipientsList');
 const addRecipientBtn = document.getElementById('addRecipientBtn');
 
@@ -639,6 +634,7 @@ const editModal = document.getElementById('editModal');
 const editModalTitle = document.getElementById('editModalTitle');
 const closeEditModal = document.getElementById('closeEditModal');
 const recipientNameInput = document.getElementById('recipientName');
+const recipientSenderNameInput = document.getElementById('recipientSenderName');
 const recipientMessageInput = document.getElementById('recipientMessage');
 const photosGrid = document.getElementById('photosGrid');
 const saveRecipientBtn = document.getElementById('saveRecipient');
@@ -702,15 +698,15 @@ function getUrlParams() {
   return { greetingData: null, isReceiver: false, isCreator: false };
 }
 
-function buildShareUrl(recipient, senderName) {
+function buildShareUrl(recipient) {
   const baseUrl = window.location.origin + window.location.pathname;
   
-  // Текст мэдээлэл + ImgBB зургийн URL-ууд (base64 биш!)
+  // Текст мэдээлэл + ImgBB зургийн URL-ууд
   const dataToEncode = {
-    n: recipient.name,           // name
-    m: recipient.message,        // message
-    s: senderName,               // sender
-    p: recipient.photoUrls || [] // ImgBB-с авсан зургийн URL-ууд
+    n: recipient.name,              // name
+    m: recipient.message,           // message
+    s: recipient.senderName || '',  // sender (recipient бүрт тусад нь)
+    p: recipient.photoUrls || []    // ImgBB-с авсан зургийн URL-ууд
   };
   
   const encoded = encodeGreetingData(dataToEncode);
@@ -771,7 +767,6 @@ function initApp() {
     // ═══════════════════════════════════════════════════════
     // CREATOR MODE - ?mode=create үед sender хуудас харуулна
     // ═══════════════════════════════════════════════════════
-    senderNameInput.value = appData.senderName;
     renderRecipientsList();
     showView('sender');
     return;
@@ -810,7 +805,8 @@ function renderRecipientsList() {
           <button class="recipient-action-btn" onclick="removeRecipient('${r.id}')" title="Устгах">🗑️</button>
         </div>
       </div>
-      ${r.photos.length > 0 ? `
+      <div style="font-size:12px;color:var(--gold);margin-bottom:8px;">Илгээгч: ${r.senderName || 'Тодорхойгүй'}</div>
+      ${r.photos && r.photos.length > 0 ? `
         <div class="photos-grid">
           ${r.photos.slice(0, 5).map(p => `<img src="${p}" class="photo-thumb"/>`).join('')}
           ${r.photos.length > 5 ? `<span style="font-size:12px;color:var(--deep);">+${r.photos.length - 5}</span>` : ''}
@@ -831,12 +827,14 @@ function openEditModal(isEdit = false) {
     const r = appData.recipients.find(x => x.id === editingId);
     if (r) {
       recipientNameInput.value = r.name;
+      recipientSenderNameInput.value = r.senderName || '';
       recipientMessageInput.value = r.message;
       tempPhotos = [...r.photos];
     }
   } else {
     editModalTitle.textContent = '🌸 Хүлээн авагч нэмэх';
     recipientNameInput.value = '';
+    recipientSenderNameInput.value = appData.senderName || ''; // Default сүүлийн нэр
     recipientMessageInput.value = '';
     tempPhotos = [];
     editingId = null;
@@ -936,6 +934,7 @@ editModal.addEventListener('click', e => { if (e.target === editModal) closeEdit
 
 saveRecipientBtn.addEventListener('click', async () => {
   const name = recipientNameInput.value.trim();
+  const senderName = recipientSenderNameInput.value.trim();
   if (!name) {
     recipientNameInput.style.borderColor = 'var(--rose)';
     recipientNameInput.focus();
@@ -963,10 +962,14 @@ saveRecipientBtn.addEventListener('click', async () => {
   const recipientData = {
     id: editingId || generateId(),
     name: name,
-    photos: [...tempPhotos],      // localStorage-д base64
+    senderName: senderName,        // Илгээгчийн нэр recipient бүрт
+    photos: [...tempPhotos],       // localStorage-д base64
     photoUrls: photoUrls,          // URL-д ImgBB link
     message: recipientMessageInput.value.trim() || 'Эрүүл энх, аз жаргал, амжилт бүхнийг хүсье. Баярын мэнд хүргэе!'
   };
+  
+  // Сүүлийн илгээгчийн нэрийг хадгалах (дараагийн удаад default болно)
+  appData.senderName = senderName;
   
   if (editingId) {
     const idx = appData.recipients.findIndex(r => r.id === editingId);
@@ -984,12 +987,6 @@ saveRecipientBtn.addEventListener('click', async () => {
   saveRecipientBtn.textContent = '💌 Хадгалах';
 });
 
-// Save sender name on change
-senderNameInput.addEventListener('change', () => {
-  appData.senderName = senderNameInput.value.trim();
-  saveData(appData);
-});
-
 // ══════════════════════════════════════════════════════════
 // SHARE MODAL
 // ══════════════════════════════════════════════════════════
@@ -1003,7 +1000,7 @@ function openShareModal(id) {
   shareRecipientName.textContent = recipient.name;
   
   // Шинэ URL format - бүх мэдээлэл URL-д encode хийгдэнэ
-  const shareUrl = buildShareUrl(recipient, appData.senderName);
+  const shareUrl = buildShareUrl(recipient);
   shareLinkInput.value = shareUrl;
   
   const shareText = `🌸 ${recipient.name}, танд Эмэгтэйчүүдийн баярын мэнд ирлээ!`;
@@ -1040,8 +1037,8 @@ document.getElementById('shareCopy').addEventListener('click', () => {
 
 // Sender preview үед ашиглана
 function updateCoverView(recipient) {
-  if (appData.senderName) {
-    coverSenderName.textContent = appData.senderName;
+  if (recipient.senderName) {
+    coverSenderName.textContent = recipient.senderName;
     coverFrom.style.display = 'block';
   } else {
     coverFrom.style.display = 'none';
@@ -1076,7 +1073,7 @@ openGiftBtn.addEventListener('click', () => {
 function updateGreetingView(recipient) {
   greetingName.textContent = recipient.name;
   greetingMessage.textContent = recipient.message;
-  greetingSender.textContent = appData.senderName || 'Найз';
+  greetingSender.textContent = recipient.senderName || 'Найз';
   renderSlideshow(recipient.photos);
 }
 
