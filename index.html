@@ -646,12 +646,12 @@ function getUrlParams() {
 function buildShareUrl(recipient, senderName) {
   const baseUrl = window.location.origin + window.location.pathname;
   
-  // Зурагнуудыг хасаж, зөвхөн текст мэдээлэл илгээнэ (URL хэт урт болохоос сэргийлэх)
+  // Зөвхөн текст мэдээлэл - зураг URL-д орохгүй (хэт урт болно)
   const dataToEncode = {
     n: recipient.name,           // name
     m: recipient.message,        // message
-    s: senderName,               // sender
-    p: recipient.photos.slice(0, 3) // photos (max 3, URL limit)
+    s: senderName                // sender
+    // Зураг орохгүй - URL богино байх ёстой
   };
   
   const encoded = encodeGreetingData(dataToEncode);
