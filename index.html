@@ -949,10 +949,15 @@ saveRecipientBtn.addEventListener('click', async () => {
   // Зургуудыг ImgBB-д upload хийх
   let photoUrls = [];
   if (IMGBB_API_KEY && tempPhotos.length > 0) {
+    console.log('ImgBB upload эхэллээ, зургийн тоо:', tempPhotos.length);
     for (const photo of tempPhotos) {
       const url = await uploadToImgBB(photo);
+      console.log('ImgBB upload үр дүн:', url);
       if (url) photoUrls.push(url);
     }
+    console.log('Бүх photoUrls:', photoUrls);
+  } else {
+    console.log('ImgBB upload хийгдээгүй. API_KEY:', !!IMGBB_API_KEY, 'Photos:', tempPhotos.length);
   }
   
   const recipientData = {
@@ -1080,6 +1085,7 @@ function updateGreetingViewFromUrl(data) {
   greetingName.textContent = data.name;
   greetingMessage.textContent = data.message;
   greetingSender.textContent = data.sender || 'Найз';
+  // photos нь ImgBB URL-ууд (p параметрээс)
   renderSlideshow(data.photos || []);
 }
 
