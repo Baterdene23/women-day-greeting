@@ -686,9 +686,15 @@ function initApp() {
   const params = getUrlParams();
   
   if (params.isReceiver && params.greetingData) {
-    // Receiver mode - хүлээн авагч линкээр орж ирсэн
-    // URL-с бүх мэдээллийг авна (localStorage-с биш!)
+    // ═══════════════════════════════════════════════════════
+    // RECEIVER MODE - Зөвхөн мэндчилгээ харна
+    // Sender хуудас, mode toggle, бүх засварлах боломж ХААГДАНА
+    // ═══════════════════════════════════════════════════════
     isReceiverMode = true;
+    
+    // Mode toggle товчийг бүрэн нуух (receiver хүн sender хуудас руу орохгүй)
+    modeToggle.style.display = 'none';
+    modeToggle.remove(); // DOM-с бүрэн устгана
     
     // URL-с авсан мэдээллийг хадгална
     receivedGreeting = {
@@ -703,7 +709,10 @@ function initApp() {
     return;
   }
   
-  // Sender mode
+  // ═══════════════════════════════════════════════════════
+  // SENDER MODE - Зөвхөн ?g= параметргүй үед
+  // localStorage дээр тулгуурлана (зөвхөн энэ төхөөрөмжид)
+  // ═══════════════════════════════════════════════════════
   senderNameInput.value = appData.senderName;
   renderRecipientsList();
   showView('sender');
@@ -1045,22 +1054,37 @@ function stopSlideshow() {
 // NAVIGATION
 // ══════════════════════════════════════════════════════════
 backBtn.addEventListener('click', () => {
-  if (views.greeting.classList.contains('active')) {
-    const recipient = appData.recipients.find(r => r.id === viewingRecipientId);
-    if (recipient) {
-      updateCoverView(recipient);
+  if (isReceiverMode) {
+    // Receiver mode - greeting -> cover руу буцна, sender хуудас руу орохгүй
+    if (views.greeting.classList.contains('active')) {
+      updateCoverViewFromUrl(receivedGreeting);
       showView('cover');
     }
+    // Cover дээр байвал буцах товч харагдахгүй (showView дотор нуугдана)
   } else {
-    showView('sender');
-    viewingRecipientId = null;
+    // Sender mode - preview үед
+    if (views.greeting.classList.contains('active')) {
+      const recipient = appData.recipients.find(r => r.id === viewingRecipientId);
+      if (recipient) {
+        updateCoverView(recipient);
+        showView('cover');
+      }
+    } else {
+      showView('sender');
+      viewingRecipientId = null;
+    }
   }
 });
 
-modeToggle.addEventListener('click', () => {
-  showView('sender');
-  viewingRecipientId = null;
-});
+// modeToggle зөвхөн sender mode-д ажиллана (receiver mode-д DOM-с устгагдсан)
+if (modeToggle) {
+  modeToggle.addEventListener('click', () => {
+    if (!isReceiverMode) {
+      showView('sender');
+      viewingRecipientId = null;
+    }
+  });
+}
 
 // ══════════════════════════════════════════════════════════
 // INITIALIZE
