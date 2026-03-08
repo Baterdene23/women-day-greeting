@@ -372,9 +372,23 @@
 <button class="back-btn hidden" id="backBtn">←</button>
 
 <!-- ══════════════════════════════════════════════════════════
-     VIEW 1: SENDER MODE
+     VIEW 0: NOT FOUND - Мэндчилгээ олдсонгүй
 ══════════════════════════════════════════════════════════ -->
-<div class="view active" id="senderView">
+<div class="view" id="notFoundView">
+  <div class="cover-card">
+    <div class="cover-border top"></div>
+    <div class="cover-border bottom"></div>
+    <div class="cover-gift-icon">🌸</div>
+    <h1 class="cover-title">Мэндчилгээ олдсонгүй</h1>
+    <p class="cover-subtitle">Энэ холбоос буруу эсвэл хүчингүй болсон байна.<br/>Та зөв холбоосоор орсон эсэхээ шалгана уу.</p>
+    <div class="cover-date">MARCH 8 · 2026</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     VIEW 1: SENDER MODE (Нууц - зөвхөн ?mode=create үед)
+══════════════════════════════════════════════════════════ -->
+<div class="view" id="senderView">
   <div class="sender-panel">
     <div class="sender-header">
       <h1>🌸 Мэндчилгээ бэлдэх</h1>
@@ -572,6 +586,7 @@ let receivedGreeting = null; // URL-с авсан мэдээлэл
 // ELEMENTS
 // ══════════════════════════════════════════════════════════
 const views = {
+  notFound: document.getElementById('notFoundView'),
   sender: document.getElementById('senderView'),
   cover: document.getElementById('coverView'),
   greeting: document.getElementById('greetingView')
@@ -632,15 +647,22 @@ function decodeGreetingData(encoded) {
 function getUrlParams() {
   const params = new URLSearchParams(window.location.search);
   const greetingData = params.get('g'); // 'g' = greeting data encoded
+  const mode = params.get('mode'); // 'mode=create' = sender хуудас
   
   if (greetingData) {
     const decoded = decodeGreetingData(greetingData);
     if (decoded) {
-      return { greetingData: decoded, isReceiver: true };
+      return { greetingData: decoded, isReceiver: true, isCreator: false };
     }
   }
   
-  return { greetingData: null, isReceiver: false };
+  // ?mode=create үед sender хуудас харуулна
+  if (mode === 'create') {
+    return { greetingData: null, isReceiver: false, isCreator: true };
+  }
+  
+  // Ямар ч параметргүй бол - "олдсонгүй" хуудас
+  return { greetingData: null, isReceiver: false, isCreator: false };
 }
 
 function buildShareUrl(recipient, senderName) {
@@ -688,13 +710,12 @@ function initApp() {
   if (params.isReceiver && params.greetingData) {
     // ═══════════════════════════════════════════════════════
     // RECEIVER MODE - Зөвхөн мэндчилгээ харна
-    // Sender хуудас, mode toggle, бүх засварлах боломж ХААГДАНА
     // ═══════════════════════════════════════════════════════
     isReceiverMode = true;
     
-    // Mode toggle товчийг бүрэн нуух (receiver хүн sender хуудас руу орохгүй)
+    // Mode toggle товчийг бүрэн нуух
     modeToggle.style.display = 'none';
-    modeToggle.remove(); // DOM-с бүрэн устгана
+    modeToggle.remove();
     
     // URL-с авсан мэдээллийг хадгална
     receivedGreeting = {
@@ -709,13 +730,22 @@ function initApp() {
     return;
   }
   
+  if (params.isCreator) {
+    // ═══════════════════════════════════════════════════════
+    // CREATOR MODE - ?mode=create үед sender хуудас харуулна
+    // ═══════════════════════════════════════════════════════
+    senderNameInput.value = appData.senderName;
+    renderRecipientsList();
+    showView('sender');
+    return;
+  }
+  
   // ═══════════════════════════════════════════════════════
-  // SENDER MODE - Зөвхөн ?g= параметргүй үед
-  // localStorage дээр тулгуурлана (зөвхөн энэ төхөөрөмжид)
+  // NOT FOUND - Ямар ч параметргүй бол
   // ═══════════════════════════════════════════════════════
-  senderNameInput.value = appData.senderName;
-  renderRecipientsList();
-  showView('sender');
+  modeToggle.style.display = 'none';
+  backBtn.style.display = 'none';
+  showView('notFound');
 }
 
 // ══════════════════════════════════════════════════════════
