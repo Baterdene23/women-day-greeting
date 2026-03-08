@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Олон улсын эмэгтэйчүүдийн эрхийг хамгаалах өдрийн мэнд хүргэе!</title>
+<meta property="og:title" content="Танд мэндчилгээ ирлээ! 🌸"/>
+<meta property="og:description" content="Олон Улсын Эмэгтэйчүүдийн Баярын Өдрийн Мэндчилгээ - 3-р сарын 8"/>
+<meta property="og:type" content="website"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --gold: #c8976a; --deep: #8b4f6b; --silk: #e8c4d0;
+    --blush: #fad4df; --petal: #fde8ee; --rose: #e8729a;
+  }
+  body {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 20% 10%, #fce4ec 0%, #f8bbd0 30%, #fce4ec 60%, #fff0f5 100%);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    padding: 20px;
+  }
+
+  /* ── Petals ── */
+  .petals-layer { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .petal { position: absolute; border-radius: 50% 0 50% 0; opacity: 0; animation: floatPetal linear infinite; }
+  .petal:nth-child(1)  { width:12px;height:12px;background:#f48fb1;left:8%;  animation-duration:12s;animation-delay:0s }
+  .petal:nth-child(2)  { width:8px; height:8px; background:#fce4ec;left:18%; animation-duration:14s;animation-delay:2s }
+  .petal:nth-child(3)  { width:14px;height:14px;background:#f8bbd0;left:30%; animation-duration:11s;animation-delay:1s }
+  .petal:nth-child(4)  { width:10px;height:10px;background:#ffcdd2;left:42%; animation-duration:16s;animation-delay:4s }
+  .petal:nth-child(5)  { width:9px; height:9px; background:#f48fb1;left:55%; animation-duration:13s;animation-delay:.5s }
+  .petal:nth-child(6)  { width:13px;height:13px;background:#fce4ec;left:68%; animation-duration:15s;animation-delay:3s }
+  .petal:nth-child(7)  { width:7px; height:7px; background:#f8bbd0;left:80%; animation-duration:10s;animation-delay:1.5s }
+  .petal:nth-child(8)  { width:11px;height:11px;background:#ffcdd2;left:92%; animation-duration:17s;animation-delay:5s }
+  .petal:nth-child(9)  { width:8px; height:8px; background:#f48fb1;left:25%; animation-duration:12s;animation-delay:6s }
+  .petal:nth-child(10) { width:15px;height:15px;background:#fce4ec;left:72%; animation-duration:14s;animation-delay:2.5s }
+  .petal:nth-child(11) { width:6px; height:6px; background:#f8bbd0;left:48%; animation-duration:9s; animation-delay:7s }
+  .petal:nth-child(12) { width:10px;height:10px;background:#ffcdd2;left:5%;  animation-duration:18s;animation-delay:3.5s }
+  @keyframes floatPetal {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+    10%  { opacity: .6; }
+    90%  { opacity: .3; }
+    100% { transform: translateY(110vh) rotate(540deg); opacity: 0; }
+  }
+
+  /* ── Views ── */
+  .view { display: none; width: 100%; max-width: 500px; }
+  .view.active { display: flex; flex-direction: column; align-items: center; }
+
+  /* ══════════════════════════════════════════════════════════
+     SENDER VIEW - Илгээгч хуудас
+  ══════════════════════════════════════════════════════════ */
+  .sender-panel {
+    position: relative; z-index: 1; width: 100%;
+    background: linear-gradient(160deg, #fff7f9 0%, #fde8ee 40%, #fce4ec 100%);
+    border-radius: 12px;
+    box-shadow: 0 0 0 1px rgba(200,151,106,.25), 0 8px 40px rgba(139,79,107,.2);
+    overflow: hidden;
+    animation: slideUp .6s ease both;
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
+  
+  .sender-header {
+    background: linear-gradient(135deg, var(--rose), var(--deep));
+    color: #fff; padding: 24px; text-align: center;
+  }
+  .sender-header h1 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  .sender-header p { font-size: 14px; opacity: .9; }
+  .sender-body { padding: 24px; }
+
+  .sender-info-section {
+    background: rgba(255,255,255,.6); border: 1px solid rgba(200,151,106,.2);
+    border-radius: 10px; padding: 18px; margin-bottom: 20px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif; font-size: 15px; color: var(--deep);
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Recipient List */
+  .recipients-list { display: flex; flex-direction: column; gap: 12px; }
+  .recipient-card {
+    background: rgba(255,255,255,.7); border: 1px solid rgba(200,151,106,.25);
+    border-radius: 10px; padding: 16px; position: relative;
+    animation: fadeIn .4s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+  
+  .recipient-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .recipient-name-display { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--deep); font-style: italic; }
+  .recipient-actions { display: flex; gap: 6px; }
+  .recipient-action-btn {
+    width: 32px; height: 32px; background: rgba(200,151,106,.15); border: none; border-radius: 50%;
+    cursor: pointer; font-size: 14px; color: var(--deep); transition: all .15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .recipient-action-btn:hover { background: rgba(200,151,106,.3); }
+  .recipient-action-btn.share { background: linear-gradient(135deg, var(--rose), #c8506a); color: #fff; }
+  .recipient-action-btn.share:hover { transform: scale(1.1); }
+
+  .photos-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .photo-thumb { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 2px solid var(--silk); }
+  .recipient-message { font-size: 12px; color: #7a4060; font-style: italic; line-height: 1.4; }
+
+  .add-recipient-btn {
+    width: 100%; padding: 14px; border: 2px dashed rgba(200,151,106,.4); border-radius: 10px;
+    background: rgba(255,255,255,.5); cursor: pointer;
+    font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--deep);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all .2s; margin-top: 12px;
+  }
+  .add-recipient-btn:hover { border-color: var(--gold); background: rgba(255,247,249,.8); }
+
+  /* Field styles */
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 11px; color: var(--deep); letter-spacing: .1em; margin-bottom: 5px; font-weight: 700; text-transform: uppercase; }
+  .field input, .field textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid rgba(200,151,106,.35); border-radius: 6px;
+    background: rgba(255,255,255,.8); font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #5a2a45;
+    outline: none; transition: border-color .2s;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--gold); }
+  .field textarea { min-height: 70px; resize: vertical; }
+
+  /* ══════════════════════════════════════════════════════════
+     COVER VIEW - Мэндчилгээ нээх
+  ══════════════════════════════════════════════════════════ */
+  .cover-card {
+    position: relative; z-index: 1; width: 100%; max-width: 420px;
+    background: linear-gradient(160deg, #fff7f9 0%, #fde8ee 40%, #fce4ec 100%);
+    border-radius: 16px;
+    box-shadow: 0 0 0 1px rgba(200,151,106,.25), 0 12px 50px rgba(139,79,107,.25);
+    overflow: hidden; text-align: center; padding: 50px 36px;
+    animation: cardPop .8s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes cardPop { from { opacity: 0; transform: scale(.9) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  
+  .cover-border { position: absolute; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #e8c4d0, #c8976a, #f48fb1, #c8976a, #e8c4d0); }
+  .cover-border.top { top: 0; }
+  .cover-border.bottom { bottom: 0; }
+
+  .cover-gift-icon {
+    width: 110px; height: 110px; margin: 0 auto 28px;
+    background: radial-gradient(circle, #fde8ee 0%, #f8bbd0 100%);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 55px; border: 3px solid rgba(200,151,106,.3);
+    box-shadow: 0 8px 30px rgba(248,187,208,.5);
+    animation: giftPulse 2s ease-in-out infinite;
+  }
+  @keyframes giftPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 8px 30px rgba(248,187,208,.5); }
+    50% { transform: scale(1.05); box-shadow: 0 12px 45px rgba(248,187,208,.7); }
+  }
+
+  .cover-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--deep); margin-bottom: 10px; animation: textFade .8s .3s ease both; }
+  @keyframes textFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+  .cover-subtitle { font-size: 15px; color: #a07090; font-style: italic; margin-bottom: 10px; line-height: 1.6; animation: textFade .8s .4s ease both; }
+  .cover-date { font-size: 12px; color: var(--gold); letter-spacing: .2em; text-transform: uppercase; margin-bottom: 28px; animation: textFade .8s .5s ease both; }
+
+  .open-gift-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: linear-gradient(135deg, var(--rose), #c8506a);
+    color: #fff; border: none; border-radius: 50px;
+    padding: 18px 42px; font-size: 18px; font-family: 'Cormorant Garamond', serif;
+    font-weight: 600; letter-spacing: .05em; cursor: pointer;
+    box-shadow: 0 8px 30px rgba(200,80,106,.4);
+    transition: all .25s; animation: btnPop .8s .6s ease both;
+    position: relative; overflow: hidden;
+  }
+  @keyframes btnPop { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
+  .open-gift-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,.25) 0%, transparent 50%); }
+  .open-gift-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 12px 40px rgba(200,80,106,.5); }
+
+  .cover-from { margin-top: 32px; padding-top: 20px; border-top: 1px solid rgba(200,151,106,.25); animation: textFade .8s .7s ease both; }
+  .cover-from-label { font-size: 11px; color: var(--gold); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 6px; }
+  .cover-from-name { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--deep); font-style: italic; }
+
+  /* ══════════════════════════════════════════════════════════
+     GREETING VIEW - Мэндчилгээ
+  ══════════════════════════════════════════════════════════ */
+  .greeting-card {
+    position: relative; z-index: 1; width: 100%; max-width: 460px;
+    background: linear-gradient(160deg, #fff7f9 0%, #fde8ee 40%, #fce4ec 100%);
+    border-radius: 12px;
+    box-shadow: 0 0 0 1px rgba(200,151,106,.25), 0 8px 40px rgba(139,79,107,.2);
+    overflow: hidden; animation: cardReveal .8s ease both;
+  }
+  @keyframes cardReveal { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+  .greeting-border { width: 100%; height: 8px; background: linear-gradient(90deg, #e8c4d0, #c8976a, #f48fb1, #c8976a, #e8c4d0); }
+
+  /* Slideshow */
+  .slideshow-container { position: relative; width: 100%; height: 400px; overflow: hidden; background: linear-gradient(135deg, #fce4ec, #f8bbd0); display: flex; align-items: center; justify-content: center; }
+  .slide { position: absolute; inset: 0; opacity: 0; transition: opacity .6s ease, transform .6s ease; }
+  .slide.active { opacity: 1; z-index: 1; }
+  .slide img { width: 100%; height: 100%; object-fit: contain; }
+  .slide-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 70px; }
+  .slide-placeholder span { font-size: 14px; color: var(--deep); margin-top: 12px; }
+
+  .slideshow-dots { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 5; }
+  .dot { width: 8px; height: 8px; background: rgba(255,255,255,.5); border-radius: 50%; cursor: pointer; transition: all .3s; }
+  .dot.active { background: #fff; transform: scale(1.2); }
+
+  /* Greeting content */
+  .greeting-content { padding: 28px; text-align: center; }
+  .greeting-recipient { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--deep); margin-bottom: 8px; animation: riseIn .6s .3s ease both; }
+  .greeting-recipient span { color: var(--gold); }
+  @keyframes riseIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .greeting-date { font-size: 12px; color: var(--gold); letter-spacing: .2em; margin-bottom: 20px; animation: riseIn .6s .4s ease both; }
+
+  .greeting-divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; animation: riseIn .6s .5s ease both; }
+  .greeting-divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,151,106,.4), transparent); }
+  .greeting-divider-icon { color: var(--gold); font-size: 20px; }
+
+  .greeting-message {
+    font-size: 16px; color: #6a3050; line-height: 1.9; font-style: italic;
+    padding: 20px; background: rgba(255,255,255,.5); border-radius: 10px;
+    border: 1px solid rgba(200,151,106,.2); animation: riseIn .6s .6s ease both; white-space: pre-line;
+  }
+
+  .sender-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(200,151,106,.2); animation: riseIn .6s .7s ease both; }
+  .sender-label { font-size: 11px; color: var(--gold); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 8px; }
+  .sender-name { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--deep); font-style: italic; }
+
+  /* ══════════════════════════════════════════════════════════
+     MODALS
+  ══════════════════════════════════════════════════════════ */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(80,20,40,.5); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .3s; padding: 20px;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: linear-gradient(160deg, #fff7f9 0%, #fde8ee 100%);
+    border-radius: 16px; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(139,79,107,.35);
+    transform: scale(.9) translateY(20px); transition: transform .35s ease;
+  }
+  .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+  
+  .modal-header {
+    padding: 20px 24px; border-bottom: 1px solid rgba(200,151,106,.2);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; background: linear-gradient(160deg, #fff7f9 0%, #fde8ee 100%); z-index: 10;
+  }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--deep); font-style: italic; }
+  .modal-close {
+    width: 32px; height: 32px; background: rgba(200,151,106,.15); border: none; border-radius: 50%;
+    cursor: pointer; font-size: 16px; color: var(--deep);
+    display: flex; align-items: center; justify-content: center; transition: background .2s;
+  }
+  .modal-close:hover { background: rgba(200,151,106,.3); }
+  .modal-body { padding: 24px; }
+
+  /* Photo upload */
+  .photos-upload-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .photo-upload-item { width: 70px; height: 70px; position: relative; }
+  .photo-upload-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 2px solid var(--silk); }
+  .photo-upload-item .remove-photo {
+    position: absolute; top: -6px; right: -6px; width: 22px; height: 22px;
+    background: var(--rose); border: 2px solid #fff; border-radius: 50%;
+    cursor: pointer; font-size: 12px; color: #fff; display: flex; align-items: center; justify-content: center;
+  }
+  .photo-upload-add {
+    width: 70px; height: 70px; border: 2px dashed rgba(200,151,106,.4); border-radius: 8px;
+    background: rgba(255,255,255,.5); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--gold); transition: all .2s;
+  }
+  .photo-upload-add:hover { border-color: var(--gold); background: rgba(255,247,249,.9); }
+  .photo-upload-add input { display: none; }
+
+  .save-btn {
+    width: 100%; padding: 14px; border: none; border-radius: 50px;
+    background: linear-gradient(135deg, var(--gold), var(--rose));
+    color: #fff; font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 600;
+    cursor: pointer; box-shadow: 0 4px 20px rgba(200,151,106,.35); transition: all .2s; margin-top: 10px;
+  }
+  .save-btn:hover { transform: translateY(-2px); }
+
+  /* ══════════════════════════════════════════════════════════
+     SHARE MODAL
+  ══════════════════════════════════════════════════════════ */
+  .share-options { display: flex; flex-direction: column; gap: 12px; }
+  .share-btn {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(200,151,106,.2);
+    background: rgba(255,255,255,.7); cursor: pointer;
+    transition: all .2s; text-decoration: none;
+  }
+  .share-btn:hover { background: #fff; transform: translateX(4px); border-color: var(--gold); }
+  .share-btn-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+  }
+  .share-btn-icon.fb { background: #1877f2; color: #fff; }
+  .share-btn-icon.messenger { background: linear-gradient(135deg, #00b2ff, #006aff); color: #fff; }
+  .share-btn-icon.ig { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; }
+  .share-btn-icon.email { background: #ea4335; color: #fff; }
+  .share-btn-icon.copy { background: var(--gold); color: #fff; }
+  .share-btn-icon.whatsapp { background: #25d366; color: #fff; }
+  .share-btn-text { flex: 1; }
+  .share-btn-title { font-size: 15px; font-weight: 600; color: var(--deep); }
+  .share-btn-desc { font-size: 12px; color: #a07090; }
+
+  .share-link-box {
+    margin-top: 16px; padding: 14px; background: rgba(255,255,255,.8);
+    border: 1px solid rgba(200,151,106,.3); border-radius: 10px;
+  }
+  .share-link-label { font-size: 11px; color: var(--gold); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+  .share-link-input {
+    width: 100%; padding: 10px; border: 1px solid rgba(200,151,106,.3); border-radius: 6px;
+    font-family: 'Cormorant Garamond', serif; font-size: 13px; color: var(--deep);
+    background: #fff;
+  }
+  .copy-success {
+    display: none; margin-top: 10px; padding: 10px;
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    border-radius: 8px; color: #155724; font-size: 14px; text-align: center;
+  }
+  .copy-success.show { display: block; animation: fadeIn .3s ease; }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 40px 20px; color: #a07090; }
+  .empty-state-icon { font-size: 50px; margin-bottom: 16px; }
+  .empty-state p { font-size: 15px; line-height: 1.6; }
+
+  /* Mode toggle */
+  .mode-toggle {
+    position: fixed; top: 20px; right: 20px; z-index: 100;
+    padding: 10px 18px; background: rgba(255,255,255,.9);
+    border: 1px solid rgba(200,151,106,.3); border-radius: 50px;
+    cursor: pointer; font-family: 'Cormorant Garamond', serif;
+    font-size: 13px; color: var(--deep);
+    box-shadow: 0 4px 15px rgba(139,79,107,.15);
+    transition: all .2s; display: flex; align-items: center; gap: 6px;
+  }
+  .mode-toggle:hover { transform: scale(1.05); }
+  .mode-toggle.hidden { display: none; }
+
+  /* Back button */
+  .back-btn {
+    position: fixed; top: 20px; left: 20px; z-index: 100;
+    width: 40px; height: 40px; background: rgba(255,255,255,.9);
+    border: 1px solid rgba(200,151,106,.3); border-radius: 50%;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: var(--deep);
+    box-shadow: 0 4px 15px rgba(139,79,107,.15); transition: all .2s;
+  }
+  .back-btn:hover { transform: scale(1.1); }
+  .back-btn.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="petals-layer">
+  <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+  <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+  <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+  <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+</div>
+
+<button class="mode-toggle" id="modeToggle">
+  <span id="modeIcon">✏️</span>
+  <span id="modeText">Тохируулах</span>
+</button>
+
+<button class="back-btn hidden" id="backBtn">←</button>
+
+<!-- ══════════════════════════════════════════════════════════
+     VIEW 1: SENDER MODE
+══════════════════════════════════════════════════════════ -->
+<div class="view active" id="senderView">
+  <div class="sender-panel">
+    <div class="sender-header">
+      <h1>🌸 Мэндчилгээ бэлдэх</h1>
+      <p>Баярын мэндчилгээ илгээх боломжтой</p>
+    </div>
+    <div class="sender-body">
+      <div class="sender-info-section">
+        <div class="section-title">Таны мэдээлэл</div>
+        <div class="field">
+          <label>Таны нэр (илгээгч)</label>
+          <input type="text" id="senderName" placeholder="Жишээ: Батаа"/>
+        </div>
+      </div>
+
+      <div class="section-title">🎀 Хүлээн авагч</div>
+      <div class="recipients-list" id="recipientsList"></div>
+      <button class="add-recipient-btn" id="addRecipientBtn">
+        <span>➕</span> Хүлээн авагч нэмэх
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     VIEW 2: COVER
+══════════════════════════════════════════════════════════ -->
+<div class="view" id="coverView">
+  <div class="cover-card">
+    <div class="cover-border top"></div>
+    <div class="cover-border bottom"></div>
+    <div class="cover-gift-icon">🎁</div>
+    <h1 class="cover-title">Танд мэндчилгээ ирлээ!</h1>
+    <p class="cover-subtitle">Олон Улсын Эмэгтэйчүүдийн<br/>Баярын Өдрийн Мэндчилгээ</p>
+    <div class="cover-date">2026 оны 3-р сарын 8</div>
+    <button class="open-gift-btn" id="openGiftBtn"><span>🌸</span> Мэндчилгээ нээх</button>
+    <div class="cover-from" id="coverFrom">
+      <div class="cover-from-label">Хүндэтгэсэн</div>
+      <div class="cover-from-name" id="coverSenderName"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     VIEW 3: GREETING
+══════════════════════════════════════════════════════════ -->
+<div class="view" id="greetingView">
+  <div class="greeting-card">
+    <div class="greeting-border"></div>
+    <div class="slideshow-container" id="slideshow"></div>
+    <div class="greeting-content">
+      <h1 class="greeting-recipient">Баярын мэнд хүргэе, <span id="greetingName"></span>!</h1>
+      <div class="greeting-date">MARCH 8 · 2026</div>
+      <div class="greeting-divider">
+        <div class="greeting-divider-line"></div>
+        <div class="greeting-divider-icon">✿</div>
+        <div class="greeting-divider-line"></div>
+      </div>
+      <div class="greeting-message" id="greetingMessage"></div>
+      <div class="sender-section">
+        <div class="sender-label">Хайр дүүрэн илгээсэн</div>
+        <div class="sender-name" id="greetingSender"></div>
+      </div>
+    </div>
+    <div class="greeting-border"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL: Add/Edit Recipient
+══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="editModalTitle">🌸 Хүлээн авагч нэмэх</div>
+      <button class="modal-close" id="closeEditModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Хүлээн авагчийн нэр</label>
+        <input type="text" id="recipientName" placeholder="Жишээ: Оюунаа"/>
+      </div>
+      <div class="field">
+        <label>Зурагнууд</label>
+        <div class="photos-upload-grid" id="photosGrid"></div>
+      </div>
+      <div class="field">
+        <label>Хувийн мэндчилгээ</label>
+        <textarea id="recipientMessage" placeholder="Таны хайр, халамж энэ гэрийг гэрэлтүүлж байна..."></textarea>
+      </div>
+      <button class="save-btn" id="saveRecipient">💌 Хадгалах</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL: Share
+══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📤 Мэндчилгээ илгээх</div>
+      <button class="modal-close" id="closeShareModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:16px; color:#7a4060; font-size:14px; text-align:center;">
+        <strong id="shareRecipientName"></strong> руу мэндчилгээ илгээх
+      </p>
+      
+      <div class="share-options">
+        <a class="share-btn" id="shareFB" href="#" target="_blank">
+          <div class="share-btn-icon fb">f</div>
+          <div class="share-btn-text">
+            <div class="share-btn-title">Facebook</div>
+            <div class="share-btn-desc">Хуваалцах</div>
+          </div>
+        </a>
+        <a class="share-btn" id="shareMessenger" href="#" target="_blank">
+          <div class="share-btn-icon messenger"></div>
+          <div class="share-btn-text">
+            <div class="share-btn-title">Messenger</div>
+            <div class="share-btn-desc">Шууд мессеж илгээх</div>
+          </div>
+        </a>
+        <a class="share-btn" id="shareWhatsApp" href="#" target="_blank">
+          <div class="share-btn-icon whatsapp"></div>
+          <div class="share-btn-text">
+            <div class="share-btn-title">WhatsApp</div>
+            <div class="share-btn-desc">Чатаар илгээх</div>
+          </div>
+        </a>
+        <a class="share-btn" id="shareEmail" href="#" target="_blank">
+          <div class="share-btn-icon email"></div>
+          <div class="share-btn-text">
+            <div class="share-btn-title">Email</div>
+            <div class="share-btn-desc">И-мэйлээр илгээх</div>
+          </div>
+        </a>
+        <button class="share-btn" id="shareCopy">
+          <div class="share-btn-icon copy">🔗</div>
+          <div class="share-btn-text">
+            <div class="share-btn-title">Линк хуулах</div>
+            <div class="share-btn-desc">Хаана ч илгээх боломжтой</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="share-link-box">
+        <div class="share-link-label">Мэндчилгээний линк</div>
+        <input type="text" class="share-link-input" id="shareLink" readonly/>
+        <div class="copy-success" id="copySuccess">Линк хуулагдлаа!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DATA MANAGEMENT
+// ══════════════════════════════════════════════════════════
+const STORAGE_KEY = 'womensday_greetings';
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+}
+
+function loadData() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : { senderName: '', recipients: [] };
+  } catch (e) {
+    return { senderName: '', recipients: [] };
+  }
+}
+
+function saveData(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    if (e.name === 'QuotaExceededError') {
+      alert('Хадгалах сан дүүрсэн байна. Зургийг бага хэмжээтэй оруулаад үзнэ үү.');
+    }
+  }
+}
+
+let appData = loadData();
+let editingId = null;
+let tempPhotos = [];
+let currentSlide = 0;
+let slideInterval = null;
+let viewingRecipientId = null;
+let isReceiverMode = false;
+
+// ══════════════════════════════════════════════════════════
+// ELEMENTS
+// ══════════════════════════════════════════════════════════
+const views = {
+  sender: document.getElementById('senderView'),
+  cover: document.getElementById('coverView'),
+  greeting: document.getElementById('greetingView')
+};
+
+const modeToggle = document.getElementById('modeToggle');
+const backBtn = document.getElementById('backBtn');
+const senderNameInput = document.getElementById('senderName');
+const recipientsList = document.getElementById('recipientsList');
+const addRecipientBtn = document.getElementById('addRecipientBtn');
+
+const editModal = document.getElementById('editModal');
+const editModalTitle = document.getElementById('editModalTitle');
+const closeEditModal = document.getElementById('closeEditModal');
+const recipientNameInput = document.getElementById('recipientName');
+const recipientMessageInput = document.getElementById('recipientMessage');
+const photosGrid = document.getElementById('photosGrid');
+const saveRecipientBtn = document.getElementById('saveRecipient');
+
+const shareModal = document.getElementById('shareModal');
+const closeShareModal = document.getElementById('closeShareModal');
+const shareRecipientName = document.getElementById('shareRecipientName');
+const shareLinkInput = document.getElementById('shareLink');
+const copySuccess = document.getElementById('copySuccess');
+
+const coverFrom = document.getElementById('coverFrom');
+const coverSenderName = document.getElementById('coverSenderName');
+const openGiftBtn = document.getElementById('openGiftBtn');
+
+const slideshow = document.getElementById('slideshow');
+const greetingName = document.getElementById('greetingName');
+const greetingMessage = document.getElementById('greetingMessage');
+const greetingSender = document.getElementById('greetingSender');
+
+// ══════════════════════════════════════════════════════════
+// URL HANDLING
+// ══════════════════════════════════════════════════════════
+function getUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    recipientId: params.get('r'),
+    view: params.get('v')
+  };
+}
+
+function buildShareUrl(recipientId) {
+  const baseUrl = window.location.origin + window.location.pathname;
+  return `${baseUrl}?r=${recipientId}`;
+}
+
+// ══════════════════════════════════════════════════════════
+// VIEW MANAGEMENT
+// ══════════════════════════════════════════════════════════
+function showView(viewName) {
+  Object.values(views).forEach(v => v.classList.remove('active'));
+  views[viewName].classList.add('active');
+  
+  if (viewName === 'greeting') startSlideshow();
+  else stopSlideshow();
+  
+  // Toggle UI elements based on mode
+  if (isReceiverMode) {
+    modeToggle.classList.add('hidden');
+    backBtn.classList.add('hidden');
+  } else {
+    modeToggle.classList.remove('hidden');
+    if (viewName !== 'sender') {
+      backBtn.classList.remove('hidden');
+    } else {
+      backBtn.classList.add('hidden');
+    }
+  }
+}
+
+function initApp() {
+  const params = getUrlParams();
+  
+  if (params.recipientId) {
+    // Receiver mode - хүлээн авагч линкээр орж ирсэн
+    const recipient = appData.recipients.find(r => r.id === params.recipientId);
+    if (recipient) {
+      isReceiverMode = true;
+      viewingRecipientId = recipient.id;
+      updateCoverView(recipient);
+      showView('cover');
+      return;
+    }
+  }
+  
+  // Sender mode
+  senderNameInput.value = appData.senderName;
+  renderRecipientsList();
+  showView('sender');
+}
+
+// ══════════════════════════════════════════════════════════
+// RECIPIENTS LIST
+// ══════════════════════════════════════════════════════════
+function renderRecipientsList() {
+  if (appData.recipients.length === 0) {
+    recipientsList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">💝</div>
+        <p>Хүлээн авагч нэмж,<br/>мэндчилгээ илгээгээрэй!</p>
+      </div>
+    `;
+    return;
+  }
+
+  recipientsList.innerHTML = appData.recipients.map(r => `
+    <div class="recipient-card" data-id="${r.id}">
+      <div class="recipient-card-header">
+        <div class="recipient-name-display">${r.name}</div>
+        <div class="recipient-actions">
+          <button class="recipient-action-btn share" onclick="openShareModal('${r.id}')" title="Илгээх">📤</button>
+          <button class="recipient-action-btn" onclick="editRecipient('${r.id}')" title="Засах">✏️</button>
+          <button class="recipient-action-btn" onclick="previewRecipient('${r.id}')" title="Харах">👁️</button>
+          <button class="recipient-action-btn" onclick="removeRecipient('${r.id}')" title="Устгах">🗑️</button>
+        </div>
+      </div>
+      ${r.photos.length > 0 ? `
+        <div class="photos-grid">
+          ${r.photos.slice(0, 5).map(p => `<img src="${p}" class="photo-thumb"/>`).join('')}
+          ${r.photos.length > 5 ? `<span style="font-size:12px;color:var(--deep);">+${r.photos.length - 5}</span>` : ''}
+        </div>
+      ` : ''}
+      <div class="recipient-message">"${r.message.substring(0, 60)}${r.message.length > 60 ? '...' : ''}"</div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// EDIT MODAL
+// ══════════════════════════════════════════════════════════
+function openEditModal(isEdit = false) {
+  editModal.classList.add('open');
+  if (isEdit && editingId) {
+    editModalTitle.textContent = '✏️ Засварлах';
+    const r = appData.recipients.find(x => x.id === editingId);
+    if (r) {
+      recipientNameInput.value = r.name;
+      recipientMessageInput.value = r.message;
+      tempPhotos = [...r.photos];
+    }
+  } else {
+    editModalTitle.textContent = '🌸 Хүлээн авагч нэмэх';
+    recipientNameInput.value = '';
+    recipientMessageInput.value = '';
+    tempPhotos = [];
+    editingId = null;
+  }
+  renderPhotosGrid();
+}
+
+function closeEditModalFn() {
+  editModal.classList.remove('open');
+  tempPhotos = [];
+  editingId = null;
+}
+
+function renderPhotosGrid() {
+  const html = tempPhotos.map((p, i) => `
+    <div class="photo-upload-item">
+      <img src="${p}" alt=""/>
+      <button class="remove-photo" onclick="removePhoto(${i})">✕</button>
+    </div>
+  `).join('');
+  
+  photosGrid.innerHTML = html + `
+    <div class="photo-upload-add" onclick="document.getElementById('photoInput').click()">
+      <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotoUpload(event)"/>
+      <span>+</span>
+    </div>
+  `;
+}
+
+function handlePhotoUpload(e) {
+  Array.from(e.target.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxSize = 600;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height) {
+          if (width > maxSize) {
+            height *= maxSize / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width *= maxSize / height;
+            height = maxSize;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressed = canvas.toDataURL('image/jpeg', 0.7);
+        tempPhotos.push(compressed);
+        renderPhotosGrid();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removePhoto(index) {
+  tempPhotos.splice(index, 1);
+  renderPhotosGrid();
+}
+
+function editRecipient(id) {
+  editingId = id;
+  openEditModal(true);
+}
+
+function removeRecipient(id) {
+  if (confirm('Устгах уу?')) {
+    appData.recipients = appData.recipients.filter(r => r.id !== id);
+    saveData(appData);
+    renderRecipientsList();
+  }
+}
+
+function previewRecipient(id) {
+  viewingRecipientId = id;
+  const recipient = appData.recipients.find(r => r.id === id);
+  if (recipient) {
+    updateCoverView(recipient);
+    showView('cover');
+  }
+}
+
+addRecipientBtn.addEventListener('click', () => openEditModal(false));
+closeEditModal.addEventListener('click', closeEditModalFn);
+editModal.addEventListener('click', e => { if (e.target === editModal) closeEditModalFn(); });
+
+saveRecipientBtn.addEventListener('click', () => {
+  const name = recipientNameInput.value.trim();
+  if (!name) {
+    recipientNameInput.style.borderColor = 'var(--rose)';
+    recipientNameInput.focus();
+    return;
+  }
+  
+  const recipientData = {
+    id: editingId || generateId(),
+    name: name,
+    photos: [...tempPhotos],
+    message: recipientMessageInput.value.trim() || 'Эрүүл энх, аз жаргал, амжилт бүхнийг хүсье. Баярын мэнд хүргэе!'
+  };
+  
+  if (editingId) {
+    const idx = appData.recipients.findIndex(r => r.id === editingId);
+    if (idx >= 0) appData.recipients[idx] = recipientData;
+  } else {
+    appData.recipients.push(recipientData);
+  }
+  
+  saveData(appData);
+  renderRecipientsList();
+  closeEditModalFn();
+});
+
+// Save sender name on change
+senderNameInput.addEventListener('change', () => {
+  appData.senderName = senderNameInput.value.trim();
+  saveData(appData);
+});
+
+// ══════════════════════════════════════════════════════════
+// SHARE MODAL
+// ══════════════════════════════════════════════════════════
+let sharingRecipientId = null;
+
+function openShareModal(id) {
+  sharingRecipientId = id;
+  const recipient = appData.recipients.find(r => r.id === id);
+  if (!recipient) return;
+  
+  shareRecipientName.textContent = recipient.name;
+  const shareUrl = buildShareUrl(id);
+  shareLinkInput.value = shareUrl;
+  
+  const shareText = `🌸 ${recipient.name}, танд Эмэгтэйчүүдийн баярын мэнд ирлээ!`;
+  const encodedUrl = encodeURIComponent(shareUrl);
+  const encodedText = encodeURIComponent(shareText);
+  
+  document.getElementById('shareFB').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+  document.getElementById('shareMessenger').href = `fb-messenger://share/?link=${encodedUrl}`;
+  document.getElementById('shareWhatsApp').href = `https://wa.me/?text=${encodedText}%20${encodedUrl}`;
+  document.getElementById('shareEmail').href = `mailto:?subject=${encodeURIComponent('Эмэгтэйчүүдийн баярын мэнд!')}&body=${encodedText}%0A%0A${encodedUrl}`;
+  
+  shareModal.classList.add('open');
+  copySuccess.classList.remove('show');
+}
+
+function closeShareModalFn() {
+  shareModal.classList.remove('open');
+  sharingRecipientId = null;
+}
+
+closeShareModal.addEventListener('click', closeShareModalFn);
+shareModal.addEventListener('click', e => { if (e.target === shareModal) closeShareModalFn(); });
+
+document.getElementById('shareCopy').addEventListener('click', () => {
+  shareLinkInput.select();
+  document.execCommand('copy');
+  copySuccess.classList.add('show');
+  setTimeout(() => copySuccess.classList.remove('show'), 2500);
+});
+
+// ══════════════════════════════════════════════════════════
+// COVER & GREETING VIEWS
+// ══════════════════════════════════════════════════════════
+function updateCoverView(recipient) {
+  if (appData.senderName) {
+    coverSenderName.textContent = appData.senderName;
+    coverFrom.style.display = 'block';
+  } else {
+    coverFrom.style.display = 'none';
+  }
+}
+
+openGiftBtn.addEventListener('click', () => {
+  const recipient = appData.recipients.find(r => r.id === viewingRecipientId);
+  if (recipient) {
+    updateGreetingView(recipient);
+    showView('greeting');
+  }
+});
+
+function updateGreetingView(recipient) {
+  greetingName.textContent = recipient.name;
+  greetingMessage.textContent = recipient.message;
+  greetingSender.textContent = appData.senderName || 'Найз';
+  renderSlideshow(recipient.photos);
+}
+
+// ══════════════════════════════════════════════════════════
+// SLIDESHOW
+// ══════════════════════════════════════════════════════════
+function renderSlideshow(photos) {
+  currentSlide = 0;
+  
+  if (photos.length === 0) {
+    slideshow.innerHTML = `
+      <div class="slide active">
+        <div class="slide-placeholder">🌸<span>Эмэгтэйчүүдийн баярын мэнд!</span></div>
+      </div>
+    `;
+    return;
+  }
+  
+  slideshow.innerHTML = photos.map((p, i) => `
+    <div class="slide ${i === 0 ? 'active' : ''}"><img src="${p}" alt=""/></div>
+  `).join('') + `
+    <div class="slideshow-dots">
+      ${photos.map((_, i) => `<div class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></div>`).join('')}
+    </div>
+  `;
+}
+
+function goToSlide(index) {
+  const slides = slideshow.querySelectorAll('.slide');
+  const dots = slideshow.querySelectorAll('.dot');
+  if (slides.length <= 1) return;
+  
+  slides[currentSlide]?.classList.remove('active');
+  dots[currentSlide]?.classList.remove('active');
+  
+  currentSlide = index;
+  if (currentSlide >= slides.length) currentSlide = 0;
+  if (currentSlide < 0) currentSlide = slides.length - 1;
+  
+  slides[currentSlide]?.classList.add('active');
+  dots[currentSlide]?.classList.add('active');
+}
+
+function startSlideshow() {
+  stopSlideshow();
+  slideInterval = setInterval(() => {
+    const slides = slideshow.querySelectorAll('.slide');
+    if (slides.length > 1) goToSlide(currentSlide + 1);
+  }, 3000);
+}
+
+function stopSlideshow() {
+  if (slideInterval) { clearInterval(slideInterval); slideInterval = null; }
+}
+
+// ══════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════
+backBtn.addEventListener('click', () => {
+  if (views.greeting.classList.contains('active')) {
+    const recipient = appData.recipients.find(r => r.id === viewingRecipientId);
+    if (recipient) {
+      updateCoverView(recipient);
+      showView('cover');
+    }
+  } else {
+    showView('sender');
+    viewingRecipientId = null;
+  }
+});
+
+modeToggle.addEventListener('click', () => {
+  showView('sender');
+  viewingRecipientId = null;
+});
+
+// ══════════════════════════════════════════════════════════
+// INITIALIZE
+// ══════════════════════════════════════════════════════════
+initApp();
+</script>
+</body>
+</html>
