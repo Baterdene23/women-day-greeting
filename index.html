@@ -566,6 +566,7 @@ let currentSlide = 0;
 let slideInterval = null;
 let viewingRecipientId = null;
 let isReceiverMode = false;
+let receivedGreeting = null; // URL-с авсан мэдээлэл
 
 // ══════════════════════════════════════════════════════════
 // ELEMENTS
@@ -606,19 +607,55 @@ const greetingMessage = document.getElementById('greetingMessage');
 const greetingSender = document.getElementById('greetingSender');
 
 // ══════════════════════════════════════════════════════════
-// URL HANDLING
+// URL HANDLING - Бүх мэдээллийг URL-д encode хийнэ
 // ══════════════════════════════════════════════════════════
-function getUrlParams() {
-  const params = new URLSearchParams(window.location.search);
-  return {
-    recipientId: params.get('r'),
-    view: params.get('v')
-  };
+
+// Compress and encode data to URL-safe string
+function encodeGreetingData(data) {
+  const json = JSON.stringify(data);
+  const base64 = btoa(unescape(encodeURIComponent(json)));
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-function buildShareUrl(recipientId) {
+// Decode data from URL
+function decodeGreetingData(encoded) {
+  try {
+    let base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) base64 += '=';
+    const json = decodeURIComponent(escape(atob(base64)));
+    return JSON.parse(json);
+  } catch (e) {
+    return null;
+  }
+}
+
+function getUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const greetingData = params.get('g'); // 'g' = greeting data encoded
+  
+  if (greetingData) {
+    const decoded = decodeGreetingData(greetingData);
+    if (decoded) {
+      return { greetingData: decoded, isReceiver: true };
+    }
+  }
+  
+  return { greetingData: null, isReceiver: false };
+}
+
+function buildShareUrl(recipient, senderName) {
   const baseUrl = window.location.origin + window.location.pathname;
-  return `${baseUrl}?r=${recipientId}`;
+  
+  // Зурагнуудыг хасаж, зөвхөн текст мэдээлэл илгээнэ (URL хэт урт болохоос сэргийлэх)
+  const dataToEncode = {
+    n: recipient.name,           // name
+    m: recipient.message,        // message
+    s: senderName,               // sender
+    p: recipient.photos.slice(0, 3) // photos (max 3, URL limit)
+  };
+  
+  const encoded = encodeGreetingData(dataToEncode);
+  return `${baseUrl}?g=${encoded}`;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -648,16 +685,22 @@ function showView(viewName) {
 function initApp() {
   const params = getUrlParams();
   
-  if (params.recipientId) {
+  if (params.isReceiver && params.greetingData) {
     // Receiver mode - хүлээн авагч линкээр орж ирсэн
-    const recipient = appData.recipients.find(r => r.id === params.recipientId);
-    if (recipient) {
-      isReceiverMode = true;
-      viewingRecipientId = recipient.id;
-      updateCoverView(recipient);
-      showView('cover');
-      return;
-    }
+    // URL-с бүх мэдээллийг авна (localStorage-с биш!)
+    isReceiverMode = true;
+    
+    // URL-с авсан мэдээллийг хадгална
+    receivedGreeting = {
+      name: params.greetingData.n,
+      message: params.greetingData.m,
+      sender: params.greetingData.s,
+      photos: params.greetingData.p || []
+    };
+    
+    updateCoverViewFromUrl(receivedGreeting);
+    showView('cover');
+    return;
   }
   
   // Sender mode
@@ -859,7 +902,9 @@ function openShareModal(id) {
   if (!recipient) return;
   
   shareRecipientName.textContent = recipient.name;
-  const shareUrl = buildShareUrl(id);
+  
+  // Шинэ URL format - бүх мэдээлэл URL-д encode хийгдэнэ
+  const shareUrl = buildShareUrl(recipient, appData.senderName);
   shareLinkInput.value = shareUrl;
   
   const shareText = `🌸 ${recipient.name}, танд Эмэгтэйчүүдийн баярын мэнд ирлээ!`;
@@ -893,6 +938,8 @@ document.getElementById('shareCopy').addEventListener('click', () => {
 // ══════════════════════════════════════════════════════════
 // COVER & GREETING VIEWS
 // ══════════════════════════════════════════════════════════
+
+// Sender preview үед ашиглана
 function updateCoverView(recipient) {
   if (appData.senderName) {
     coverSenderName.textContent = appData.senderName;
@@ -902,11 +949,28 @@ function updateCoverView(recipient) {
   }
 }
 
+// URL-с авсан мэдээлэл дээр ашиглана (receiver mode)
+function updateCoverViewFromUrl(data) {
+  if (data.sender) {
+    coverSenderName.textContent = data.sender;
+    coverFrom.style.display = 'block';
+  } else {
+    coverFrom.style.display = 'none';
+  }
+}
+
 openGiftBtn.addEventListener('click', () => {
-  const recipient = appData.recipients.find(r => r.id === viewingRecipientId);
-  if (recipient) {
-    updateGreetingView(recipient);
+  if (isReceiverMode && receivedGreeting) {
+    // URL-с авсан мэдээлэл дээр
+    updateGreetingViewFromUrl(receivedGreeting);
     showView('greeting');
+  } else {
+    // Sender preview
+    const recipient = appData.recipients.find(r => r.id === viewingRecipientId);
+    if (recipient) {
+      updateGreetingView(recipient);
+      showView('greeting');
+    }
   }
 });
 
@@ -915,6 +979,14 @@ function updateGreetingView(recipient) {
   greetingMessage.textContent = recipient.message;
   greetingSender.textContent = appData.senderName || 'Найз';
   renderSlideshow(recipient.photos);
+}
+
+// URL-с авсан мэдээлэл дээр ашиглана
+function updateGreetingViewFromUrl(data) {
+  greetingName.textContent = data.name;
+  greetingMessage.textContent = data.message;
+  greetingSender.textContent = data.sender || 'Найз';
+  renderSlideshow(data.photos || []);
 }
 
 // ══════════════════════════════════════════════════════════
